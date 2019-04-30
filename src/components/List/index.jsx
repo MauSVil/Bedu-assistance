@@ -11,12 +11,13 @@ const List = ()=>{
         const fetchData = async() =>{
             const dataRaw = await fetch(`${baseUrl}/${query}`)
             const data = await dataRaw.json()
+            console.log(data)
             setInfo(data)
         }
 
         fetchData()
         return ()=>{
-            console.log('asd');
+            console.log('Se fue el componente');
         }
     },[])
     return(

@@ -8,37 +8,27 @@ const baseUrl = "http://localhost:4000"
 
 
 class Create extends Component{
+    
     state={
         name:'',
         lastname: '',
-        date: ''
+        date: '',
+        groupId: 1
     }
 
-    handleChange = e =>{
-        const {id, value} = e.target
-        this.setState({
-            [id]:value,
-            variant: '',
-            message:''
-        })   
+    getData = async () =>{
+        const dataRaw = await fetch(`${baseUrl}/students`)
+        const data = await dataRaw.json()
+        console.log(data)
     }
 
-    handleSubmit = async e =>{
-
-        const groupId = 1
-
-        const aRaw = await fetch(`${baseUrl}/students`)
-        const a = await aRaw.json()
-
-
-
-        e.preventDefault()
-        const response = await fetch(`http://localhost:4000/attendance`,{
+    sendData = async (data)=>{
+            const response = await fetch(`http://localhost:4000/students`,{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
             },
-            body: JSON.stringify(this.state)
+            body: JSON.stringify(data)
         })
         if(!response.ok){
             this.setState({
@@ -51,6 +41,44 @@ class Create extends Component{
             variant: 'success',
             message: 'Succesfull'
         })
+    }
+
+    getId = async(data)=>{ //Aqui se debe de obtener el Id del Estudiante que se mando
+       console.log(await this.sendData(data))
+    }
+
+    handleChange = e =>{
+        const {id, value} = e.target
+        this.setState({
+            [id]:value,
+            variant: '',
+            message:''
+        })   
+    }
+
+    handleSubmit = async e =>{
+        e.preventDefault()
+        const {
+            name,
+            lastname,
+            groupId,
+          } = this.state
+
+        // const groupId = 1
+
+        const studentByNameRaw = await fetch(`${baseUrl}/students?q=${this.state.name}`)
+        const sudentByName = await studentByNameRaw.json()
+
+        const studentByLastnameRaw = await fetch(`${baseUrl}/students?q=${this.state.lastname}`)
+        const studentByLastname = await studentByLastnameRaw.json()
+
+        sudentByName.length && studentByLastname.length
+        ? this.setState({
+            variant:'danger',
+            message:'You have been registered'
+        })
+        : this.getId({name,lastname,groupId})
+
     }
 
     render(){
